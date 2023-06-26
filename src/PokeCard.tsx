@@ -23,8 +23,7 @@ export default function PokeCard({ name }) {
             name: newPokemon.name,
             sprites: newPokemon.sprites,
             types: newPokemon.types,
-
-          }
+          };
           try {
             let pokemonJson = localStorage.getItem("pokemon");
             let pokemons = {};
@@ -36,7 +35,7 @@ export default function PokeCard({ name }) {
             }
             localStorage.setItem("pokemon", JSON.stringify(pokemons));
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
           setPokemon(usedPokemonValues);
           // switch loading to false after fetch is complete
@@ -44,7 +43,7 @@ export default function PokeCard({ name }) {
         } catch (error) {
           // add error handling here
           setLoading(false);
-          console.log(error);
+          console.error(error);
         }
       }
     }
@@ -61,17 +60,17 @@ export default function PokeCard({ name }) {
     );
 
   return (
-    <div className="w-full bg-white rounded-lg p-12 flex flex-col justify-center items-center">
-      <div className="mb-8">
+    <div className="w-full bg-gray-600 text-white rounded-lg p-12 flex flex-col justify-center items-center">
+      <div className="">
         <img
-          className="object-center object-cover rounded-full h-36 w-36"
+          className="object-center object-cover h-36 w-36"
           src={pokemon.sprites.front_default}
           alt={pokemon.name}
         />
       </div>
       <div className="text-center">
-        <p className="text-xl text-gray-700 font-bold mb-2">{pokemon.name}</p>
-        <div className="text-base text-gray-600 font-normal">
+        <p className="text-xl font-bold">{pokemon.name.toUpperCase()}</p>
+        <div className="flex justify-center text-base font-normal">
           {pokemon.types.map((type) => {
             return (
               <div>
