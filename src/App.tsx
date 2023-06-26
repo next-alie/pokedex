@@ -41,12 +41,12 @@ function App() {
     );
 
   function nextPage() {
-    const newPage = page + 20;
+    const newPage = page <= getDrawnPokemons().length - 20 ? page + 20 : page;
     setPage(newPage);
   }
 
   function prevPage() {
-    const newPage = page > 20 ? page - 20 : page;
+    const newPage = page >= 20 ? page - 20 : page;
     setPage(newPage);
   }
 
@@ -54,8 +54,10 @@ function App() {
     let newSelected = selected.slice();
     if (newSelected.includes(type)) {
       newSelected = newSelected.filter((i) => i !== type);
+      setPage(0);
     } else if (newSelected.length < 2) {
       newSelected.push(type);
+      setPage(0);
     }
     setSelected(newSelected);
   }
