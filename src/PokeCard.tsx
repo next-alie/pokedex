@@ -14,7 +14,8 @@ export default function PokeCard({ pokemon }) {
           {pokemon.types.map((type) => {
             return (
               <p>
-                <img className="inline"
+                <img
+                  className="inline"
                   src={
                     "icons/" +
                     type.type.name[0].toUpperCase() +
