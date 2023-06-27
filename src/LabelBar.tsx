@@ -4,7 +4,13 @@ import TypeLabel from "./TypeLabel";
 
 const api = new PokemonClient();
 
-export default function LabelBar({ selected, handleClick }: {selected: string[], handleClick: Function}) {
+export default function LabelBar({
+  selected,
+  handleClick,
+}: {
+  selected: string[];
+  handleClick: Function;
+}) {
   const [types, setTypes] = useState<NamedAPIResource[]>();
   // useEffect with an empty dependency array works the same way as componentDidMount
   useEffect(() => {

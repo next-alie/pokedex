@@ -45,7 +45,7 @@ export default function App() {
       />
     );
 
-  function handleChange(e: { target: { value: SetStateAction<string>; }; }) {
+  function handleChange(e: { target: { value: SetStateAction<string> } }) {
     setQuery(e.target.value);
   }
 
@@ -76,36 +76,38 @@ export default function App() {
     if (selected.length > 1) {
       const type1 = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
-      ].pokemon.map((i: { pokemon: any; }) => i.pokemon);
+      ].pokemon.map((i: { pokemon: any }) => i.pokemon);
       const type2 = JSON.parse(localStorage.getItem("types")!)[
         selected[1]
-      ].pokemon.map((i: { pokemon: { name: any; }; }) => i.pokemon.name);
-      drawnList = type1.filter((x: { name: any; }) => type2.includes(x.name));
+      ].pokemon.map((i: { pokemon: { name: any } }) => i.pokemon.name);
+      drawnList = type1.filter((x: { name: any }) => type2.includes(x.name));
     } else if (selected.length > 0) {
       drawnList = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
-      ].pokemon.map((i: { pokemon: any; }) => i.pokemon);
-    } 
+      ].pokemon.map((i: { pokemon: any }) => i.pokemon);
+    }
     return filterItems(drawnList, query);
   }
 
   function filterItems(items: any[], query: string) {
     query = query.toLowerCase();
-    return items.filter((item: { name: string; }) =>
-      item.name.split(" ").some((word: string) => word.toLowerCase().startsWith(query))
+    return items.filter((item: { name: string }) =>
+      item.name
+        .split(" ")
+        .some((word: string) => word.toLowerCase().startsWith(query))
     );
   }
 
   return (
     <>
-        <SearchBar
-          query={query}
-          handleChange={handleChange}
-        />
-        <LabelBar
-          selected={selected}
-          handleClick={handleClick}
-        />
+      <SearchBar
+        query={query}
+        handleChange={handleChange}
+      />
+      <LabelBar
+        selected={selected}
+        handleClick={handleClick}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-6 justify-center">
         {getDrawnPokemons()
           .slice(page, page + 20)

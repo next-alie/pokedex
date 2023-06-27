@@ -4,12 +4,12 @@ import { PokemonClient, PokemonType } from "pokenode-ts";
 const api = new PokemonClient();
 
 interface UsedPokemonValues {
-  name: string,
-  sprite: string,
-  types: PokemonType[],
-};
+  name: string;
+  sprite: string;
+  types: PokemonType[];
+}
 
-export default function PokeCard({ name }: {name: string}) {
+export default function PokeCard({ name }: { name: string }) {
   const [loading, setLoading] = useState(true);
   const [pokemon, setPokemon] = useState<UsedPokemonValues>({
     name: "",

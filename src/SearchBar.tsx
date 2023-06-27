@@ -2,7 +2,13 @@
 
 import { ChangeEventHandler } from "react";
 
-export default function SearchBar({ query, handleChange }: { query: string, handleChange: ChangeEventHandler<HTMLInputElement> }) {
+export default function SearchBar({
+  query,
+  handleChange,
+}: {
+  query: string;
+  handleChange: ChangeEventHandler<HTMLInputElement>;
+}) {
   return (
     <div className="mb-5">
       <label>
