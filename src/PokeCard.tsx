@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
-import { PokemonClient } from "pokenode-ts";
+import { PokemonClient, PokemonType } from "pokenode-ts";
 
 const api = new PokemonClient();
 
-export default function PokeCard({ name }) {
+interface UsedPokemonValues {
+  name: string;
+  sprite: string;
+  types: PokemonType[];
+}
+
+export default function PokeCard({ name }: { name: string }) {
   const [loading, setLoading] = useState(true);
-  const [pokemon, setPokemon] = useState({});
+  const [pokemon, setPokemon] = useState<UsedPokemonValues>({
+    name: "",
+    sprite: "",
+    types: [],
+  });
 
   useEffect(() => {
     async function loadPokemon() {
+      // Check if the pokemon is in local storage
       const newJson = localStorage.getItem("pokemon");
       const newPokemon = newJson ? JSON.parse(newJson)[name] : null;
       if (newPokemon) {
@@ -18,15 +29,18 @@ export default function PokeCard({ name }) {
         try {
           // set loading to true before calling API
           setLoading(true);
+          // Call api to fetch type info
           const newPokemon = await api.getPokemonByName(name);
-          const usedPokemonValues = {
+          // Only save used data
+          const usedPokemonValues: UsedPokemonValues = {
             name: newPokemon.name,
-            sprites: newPokemon.sprites,
+            sprite: newPokemon.sprites.front_default!,
             types: newPokemon.types,
           };
+          // Try to save it!
           try {
             let pokemonJson = localStorage.getItem("pokemon");
-            let pokemons = {};
+            let pokemons: { [index: string]: any } = {};
             if (pokemonJson) {
               pokemons = JSON.parse(pokemonJson);
               pokemons[name] = usedPokemonValues;
@@ -37,6 +51,7 @@ export default function PokeCard({ name }) {
           } catch (error) {
             console.error(error);
           }
+          // We are ready to show the card
           setPokemon(usedPokemonValues);
           // switch loading to false after fetch is complete
           setLoading(false);
@@ -64,7 +79,7 @@ export default function PokeCard({ name }) {
       <div className="">
         <img
           className="object-center object-cover h-36 w-36"
-          src={pokemon.sprites.front_default}
+          src={pokemon.sprite}
           alt={pokemon.name}
         />
       </div>
@@ -73,7 +88,7 @@ export default function PokeCard({ name }) {
         <div className="flex justify-center text-base font-normal">
           {pokemon.types.map((type) => {
             return (
-              <div>
+              <div key={name + "-" + type.type.name}>
                 <img
                   className="inline"
                   src={

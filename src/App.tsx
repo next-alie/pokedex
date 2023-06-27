@@ -1,20 +1,25 @@
 import { SetStateAction, useEffect, useState } from "react";
 import "./App.css";
 import PokeCard from "./PokeCard";
-import { Pokemon, PokemonClient } from "pokenode-ts";
+import { NamedAPIResource, Pokemon, PokemonClient } from "pokenode-ts";
 import LabelBar from "./LabelBar";
+import SearchBar from "./SearchBar";
 
 const api = new PokemonClient();
 
-function App() {
+export default function App() {
   const [page, setPage] = useState(0);
-  const [pokemonList, setPokemonList] = useState([]);
+  const [pokemonList, setPokemonList] = useState<NamedAPIResource[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
 
   // useEffect with an empty dependency array works the same way as componentDidMount
   useEffect(() => {
     async function fetchPokemons() {
+      // Fetch pokemon list from api
+      // TODO: Cache this
+      // TODO: Move pokemon list to its own component
       try {
         // set loading to true before calling API
         setLoading(true);
@@ -40,6 +45,10 @@ function App() {
       />
     );
 
+  function handleChange(e: { target: { value: SetStateAction<string> } }) {
+    setQuery(e.target.value);
+  }
+
   function nextPage() {
     const newPage = page <= getDrawnPokemons().length - 20 ? page + 20 : page;
     setPage(newPage);
@@ -63,33 +72,42 @@ function App() {
   }
 
   function getDrawnPokemons() {
+    let drawnList = pokemonList;
     if (selected.length > 1) {
-      const type1 = JSON.parse(localStorage.getItem("types"))[
+      const type1 = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
-      ].pokemon.map((i) => i.pokemon);
-      const type2 = JSON.parse(localStorage.getItem("types"))[
+      ].pokemon.map((i: { pokemon: any }) => i.pokemon);
+      const type2 = JSON.parse(localStorage.getItem("types")!)[
         selected[1]
-      ].pokemon.map((i) => i.pokemon.name);
-      const intersection = type1.filter((x) => type2.includes(x.name));
-      return intersection;
+      ].pokemon.map((i: { pokemon: { name: any } }) => i.pokemon.name);
+      drawnList = type1.filter((x: { name: any }) => type2.includes(x.name));
     } else if (selected.length > 0) {
-      const drawnList = JSON.parse(localStorage.getItem("types"))[
+      drawnList = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
-      ].pokemon.map((i) => i.pokemon);
-      return drawnList;
-    } else {
-      return pokemonList;
+      ].pokemon.map((i: { pokemon: any }) => i.pokemon);
     }
+    return filterItems(drawnList, query);
+  }
+
+  function filterItems(items: any[], query: string) {
+    query = query.toLowerCase();
+    return items.filter((item: { name: string }) =>
+      item.name
+        .split(" ")
+        .some((word: string) => word.toLowerCase().startsWith(query))
+    );
   }
 
   return (
     <>
-      <div className="mb-5">
-        <LabelBar
-          selected={selected}
-          handleClick={handleClick}
-        />
-      </div>
+      <SearchBar
+        query={query}
+        handleChange={handleChange}
+      />
+      <LabelBar
+        selected={selected}
+        handleClick={handleClick}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-6 justify-center">
         {getDrawnPokemons()
           .slice(page, page + 20)
@@ -116,5 +134,3 @@ function App() {
     </>
   );
 }
-
-export default App;

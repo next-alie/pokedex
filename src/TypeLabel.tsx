@@ -1,13 +1,30 @@
 import { useEffect, useState } from "react";
-import { PokemonClient } from "pokenode-ts";
+import { PokemonClient, TypePokemon } from "pokenode-ts";
 
 const api = new PokemonClient();
 
-export default function TypeLabel({ name, onClick, selected }) {
-  const [type, setType] = useState({});
+interface UsedType {
+  name: string;
+  pokemon: TypePokemon[];
+}
+
+export default function TypeLabel({
+  name,
+  onClick,
+  selected,
+}: {
+  name: string;
+  onClick: Function;
+  selected: boolean;
+}) {
+  const [type, setType] = useState<UsedType>({
+    name: "",
+    pokemon: [],
+  });
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function loadType() {
+      // Check if the type is in local storage
       const newJson = localStorage.getItem("types");
       const newType = newJson ? JSON.parse(newJson)[name] : null;
       if (newType) {
@@ -15,15 +32,17 @@ export default function TypeLabel({ name, onClick, selected }) {
         setLoading(false);
       } else {
         try {
-          // set loading to true before calling API
+          // Call api to fetch type info
           const newType = await api.getTypeByName(name);
-          const usedTypeValues = {
+          // Only save used data
+          const usedTypeValues: UsedType = {
             name: newType.name,
             pokemon: newType.pokemon,
           };
+          // Try to save it!
           try {
             let pokemonJson = localStorage.getItem("types");
-            let types = {};
+            let types: { [index: string]: any } = {};
             if (pokemonJson) {
               types = JSON.parse(pokemonJson);
               types[name] = usedTypeValues;
@@ -34,6 +53,7 @@ export default function TypeLabel({ name, onClick, selected }) {
           } catch (error) {
             console.error(error);
           }
+          // We are ready to show the label
           setType(usedTypeValues);
           setLoading(false);
         } catch (error) {
@@ -44,11 +64,12 @@ export default function TypeLabel({ name, onClick, selected }) {
     }
     loadType();
   }, []);
+  // Do not show unloaded types
   if (loading) {
     return "";
   }
   return (
-    <div onClick={onClick}>
+    <div onClick={() => onClick()}>
       <img
         className={
           "inline " + (selected ? "border-solid border-white border-2" : "")
