@@ -19,6 +19,7 @@ export default function PokeCard({ name }: {name: string}) {
 
   useEffect(() => {
     async function loadPokemon() {
+      // Check if the pokemon is in local storage
       const newJson = localStorage.getItem("pokemon");
       const newPokemon = newJson ? JSON.parse(newJson)[name] : null;
       if (newPokemon) {
@@ -28,12 +29,15 @@ export default function PokeCard({ name }: {name: string}) {
         try {
           // set loading to true before calling API
           setLoading(true);
+          // Call api to fetch type info
           const newPokemon = await api.getPokemonByName(name);
+          // Only save used data
           const usedPokemonValues: UsedPokemonValues = {
             name: newPokemon.name,
             sprite: newPokemon.sprites.front_default!,
             types: newPokemon.types,
           };
+          // Try to save it!
           try {
             let pokemonJson = localStorage.getItem("pokemon");
             let pokemons: { [index: string]: any } = {};
@@ -47,6 +51,7 @@ export default function PokeCard({ name }: {name: string}) {
           } catch (error) {
             console.error(error);
           }
+          // We are ready to show the card
           setPokemon(usedPokemonValues);
           // switch loading to false after fetch is complete
           setLoading(false);

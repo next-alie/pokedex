@@ -24,6 +24,7 @@ export default function TypeLabel({
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function loadType() {
+      // Check if the type is in local storage
       const newJson = localStorage.getItem("types");
       const newType = newJson ? JSON.parse(newJson)[name] : null;
       if (newType) {
@@ -31,12 +32,14 @@ export default function TypeLabel({
         setLoading(false);
       } else {
         try {
-          // set loading to true before calling API
+          // Call api to fetch type info
           const newType = await api.getTypeByName(name);
+          // Only save used data
           const usedTypeValues: UsedType = {
             name: newType.name,
             pokemon: newType.pokemon,
           };
+          // Try to save it!
           try {
             let pokemonJson = localStorage.getItem("types");
             let types: { [index: string]: any } = {};
@@ -50,6 +53,7 @@ export default function TypeLabel({
           } catch (error) {
             console.error(error);
           }
+          // We are ready to show the label
           setType(usedTypeValues);
           setLoading(false);
         } catch (error) {
@@ -60,6 +64,7 @@ export default function TypeLabel({
     }
     loadType();
   }, []);
+  // Do not show unloaded types
   if (loading) {
     return "";
   }

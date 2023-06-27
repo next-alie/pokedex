@@ -17,6 +17,9 @@ export default function App() {
   // useEffect with an empty dependency array works the same way as componentDidMount
   useEffect(() => {
     async function fetchPokemons() {
+      // Fetch pokemon list from api
+      // TODO: Cache this
+      // TODO: Move pokemon list to its own component
       try {
         // set loading to true before calling API
         setLoading(true);

@@ -9,6 +9,8 @@ export default function LabelBar({ selected, handleClick }: {selected: string[],
   // useEffect with an empty dependency array works the same way as componentDidMount
   useEffect(() => {
     async function fetchTypes() {
+      // Fetch type list from api
+      // TODO: Cache this
       try {
         const newTypesList: NamedAPIResource[] = (await api.listTypes(0, 9999))
           .results;
