@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import "./App.css";
 import PokeCard from "./PokeCard";
-import { Pokemon, PokemonClient } from "pokenode-ts";
+import { NamedAPIResource, Pokemon, PokemonClient } from "pokenode-ts";
 import LabelBar from "./LabelBar";
 import SearchBar from "./SearchBar";
 
@@ -9,9 +9,9 @@ const api = new PokemonClient();
 
 export default function App() {
   const [page, setPage] = useState(0);
-  const [pokemonList, setPokemonList] = useState([]);
+  const [pokemonList, setPokemonList] = useState<NamedAPIResource[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
 
   // useEffect with an empty dependency array works the same way as componentDidMount
@@ -42,7 +42,7 @@ export default function App() {
       />
     );
 
-  function handleChange(e) {
+  function handleChange(e: { target: { value: SetStateAction<string>; }; }) {
     setQuery(e.target.value);
   }
 
@@ -71,25 +71,25 @@ export default function App() {
   function getDrawnPokemons() {
     let drawnList = pokemonList;
     if (selected.length > 1) {
-      const type1 = JSON.parse(localStorage.getItem("types"))[
+      const type1 = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
-      ].pokemon.map((i) => i.pokemon);
-      const type2 = JSON.parse(localStorage.getItem("types"))[
+      ].pokemon.map((i: { pokemon: any; }) => i.pokemon);
+      const type2 = JSON.parse(localStorage.getItem("types")!)[
         selected[1]
-      ].pokemon.map((i) => i.pokemon.name);
-      drawnList = type1.filter((x) => type2.includes(x.name));
+      ].pokemon.map((i: { pokemon: { name: any; }; }) => i.pokemon.name);
+      drawnList = type1.filter((x: { name: any; }) => type2.includes(x.name));
     } else if (selected.length > 0) {
-      drawnList = JSON.parse(localStorage.getItem("types"))[
+      drawnList = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
-      ].pokemon.map((i) => i.pokemon);
+      ].pokemon.map((i: { pokemon: any; }) => i.pokemon);
     } 
     return filterItems(drawnList, query);
   }
 
-  function filterItems(items, query) {
+  function filterItems(items: any[], query: string) {
     query = query.toLowerCase();
-    return items.filter((item) =>
-      item.name.split(" ").some((word) => word.toLowerCase().startsWith(query))
+    return items.filter((item: { name: string; }) =>
+      item.name.split(" ").some((word: string) => word.toLowerCase().startsWith(query))
     );
   }
 

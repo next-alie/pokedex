@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
-import { PokemonClient } from "pokenode-ts";
+import { PokemonClient, PokemonType } from "pokenode-ts";
 
 const api = new PokemonClient();
 
-export default function PokeCard({ name }) {
+interface UsedPokemonValues {
+  name: string,
+  sprite: string,
+  types: PokemonType[],
+};
+
+export default function PokeCard({ name }: {name: string}) {
   const [loading, setLoading] = useState(true);
-  const [pokemon, setPokemon] = useState({});
+  const [pokemon, setPokemon] = useState<UsedPokemonValues>({
+    name: "",
+    sprite: "",
+    types: [],
+  });
 
   useEffect(() => {
     async function loadPokemon() {
@@ -19,14 +29,14 @@ export default function PokeCard({ name }) {
           // set loading to true before calling API
           setLoading(true);
           const newPokemon = await api.getPokemonByName(name);
-          const usedPokemonValues = {
+          const usedPokemonValues: UsedPokemonValues = {
             name: newPokemon.name,
-            sprites: newPokemon.sprites,
+            sprite: newPokemon.sprites.front_default!,
             types: newPokemon.types,
           };
           try {
             let pokemonJson = localStorage.getItem("pokemon");
-            let pokemons = {};
+            let pokemons: { [index: string]: any } = {};
             if (pokemonJson) {
               pokemons = JSON.parse(pokemonJson);
               pokemons[name] = usedPokemonValues;
@@ -64,7 +74,7 @@ export default function PokeCard({ name }) {
       <div className="">
         <img
           className="object-center object-cover h-36 w-36"
-          src={pokemon.sprites.front_default}
+          src={pokemon.sprite}
           alt={pokemon.name}
         />
       </div>
@@ -73,7 +83,7 @@ export default function PokeCard({ name }) {
         <div className="flex justify-center text-base font-normal">
           {pokemon.types.map((type) => {
             return (
-              <div>
+              <div key={name + "-" + type.type.name}>
                 <img
                   className="inline"
                   src={

@@ -1,10 +1,26 @@
 import { useEffect, useState } from "react";
-import { PokemonClient } from "pokenode-ts";
+import { PokemonClient, TypePokemon } from "pokenode-ts";
 
 const api = new PokemonClient();
 
-export default function TypeLabel({ name, onClick, selected }) {
-  const [type, setType] = useState({});
+interface UsedType {
+  name: string;
+  pokemon: TypePokemon[];
+}
+
+export default function TypeLabel({
+  name,
+  onClick,
+  selected,
+}: {
+  name: string;
+  onClick: Function;
+  selected: boolean;
+}) {
+  const [type, setType] = useState<UsedType>({
+    name: "",
+    pokemon: [],
+  });
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function loadType() {
@@ -17,13 +33,13 @@ export default function TypeLabel({ name, onClick, selected }) {
         try {
           // set loading to true before calling API
           const newType = await api.getTypeByName(name);
-          const usedTypeValues = {
+          const usedTypeValues: UsedType = {
             name: newType.name,
             pokemon: newType.pokemon,
           };
           try {
             let pokemonJson = localStorage.getItem("types");
-            let types = {};
+            let types: { [index: string]: any } = {};
             if (pokemonJson) {
               types = JSON.parse(pokemonJson);
               types[name] = usedTypeValues;
@@ -48,7 +64,7 @@ export default function TypeLabel({ name, onClick, selected }) {
     return "";
   }
   return (
-    <div onClick={onClick}>
+    <div onClick={() => onClick()}>
       <img
         className={
           "inline " + (selected ? "border-solid border-white border-2" : "")

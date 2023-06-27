@@ -1,11 +1,11 @@
-export default function SearchBar({ query, handleChange }) {
+export default function SearchBar({ query, handleChange }: { query: string, handleChange: Function }) {
   return (
     <div className="mb-5">
       <label>
         Search:{" "}
         <input
           value={query}
-          onChange={handleChange}
+          onChange={() => handleChange()}
         />
       </label>
     </div>
