@@ -4,6 +4,10 @@ import PokeCard from "./PokeCard";
 
 const api = new PokemonClient();
 
+/**
+ * Component that loads pokemons paginated 20 by 20
+ * Loads pokemon listage data
+ */
 export default function PokeList({
   getDrawnPokemons,
   page,
@@ -13,13 +17,13 @@ export default function PokeList({
 }) {
   const [pokemonList, setPokemonList] = useState<NamedAPIResource[]>([]);
   const [loading, setLoading] = useState(true);
-  const pagination = (page-1)*20;
+  const pagination = (page - 1) * 20;
 
   // useEffect with an empty dependency array works the same way as componentDidMount
   useEffect(() => {
     /**
-     *  Fetch pokemon list from api or localStorage 
-    */
+     *  Fetch pokemon list from api or localStorage
+     */
     async function fetchPokemons() {
       // set loading to true before calling API
       setLoading(true);
@@ -34,7 +38,10 @@ export default function PokeList({
           const newPokemonList = (await api.listPokemons(0, 9999)).results;
           // Try to save it!
           try {
-            localStorage.setItem("pokemon-list", JSON.stringify(newPokemonList));
+            localStorage.setItem(
+              "pokemon-list",
+              JSON.stringify(newPokemonList)
+            );
           } catch (error) {
             // add error handling here
             setLoading(false);

@@ -1,7 +1,8 @@
-// Search bar that dysplays the written value and gives its input to the parent
-
 import { ChangeEventHandler } from "react";
 
+/**
+ *Search bar that displays the written value and gives its input to the parent
+ */
 export default function SearchBar({
   query,
   handleChange,

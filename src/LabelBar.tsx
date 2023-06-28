@@ -4,6 +4,10 @@ import TypeLabel from "./TypeLabel";
 
 const api = new PokemonClient();
 
+/**
+ * Component comprised by pokemon type labels
+ * Loads type listage data
+ */
 export default function LabelBar({
   selected,
   handleClick,
@@ -20,7 +24,10 @@ export default function LabelBar({
     async function fetchTypes() {
       // Check if the pokemon is in local storage
       const newJson = localStorage.getItem("type-list");
-      console.log("🚀 ~ file: LabelBar.tsx:23 ~ fetchTypes ~ newJson:", newJson)
+      console.log(
+        "🚀 ~ file: LabelBar.tsx:23 ~ fetchTypes ~ newJson:",
+        newJson
+      );
       if (newJson) {
         setTypeList(JSON.parse(newJson));
       } else {
@@ -31,10 +38,7 @@ export default function LabelBar({
           ).results;
           // Try to save it!
           try {
-            localStorage.setItem(
-              "type-list",
-              JSON.stringify(newTypesList)
-            );
+            localStorage.setItem("type-list", JSON.stringify(newTypesList));
           } catch (error) {
             // add error handling here
             console.error(error);

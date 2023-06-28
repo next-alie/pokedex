@@ -8,6 +8,10 @@ interface UsedType {
   pokemon: TypePokemon[];
 }
 
+/**
+ * Component that contains a type name and pokemons.
+ * Fetches that info by itself
+ */
 export default function TypeLabel({
   name,
   onClick,
@@ -23,6 +27,9 @@ export default function TypeLabel({
   });
   const [loading, setLoading] = useState(true);
   useEffect(() => {
+    /**
+     * Function that loads type data from local storage or fetches it
+     */
     async function loadType() {
       // Check if the type is in local storage
       const newJson = localStorage.getItem("types");
