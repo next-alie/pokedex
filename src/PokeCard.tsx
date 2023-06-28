@@ -9,6 +9,10 @@ interface UsedPokemonValues {
   types: PokemonType[];
 }
 
+/**
+ * Component that contains a pokemon sprite, name and types.
+ * Fetches that info by itself
+ */
 export default function PokeCard({ name }: { name: string }) {
   const [loading, setLoading] = useState(true);
   const [pokemon, setPokemon] = useState<UsedPokemonValues>({
@@ -18,6 +22,9 @@ export default function PokeCard({ name }: { name: string }) {
   });
 
   useEffect(() => {
+    /**
+     * Fetches all the specific pokemon data used by the app
+     */
     async function loadPokemon() {
       // Check if the pokemon is in local storage
       const newJson = localStorage.getItem("pokemon");
