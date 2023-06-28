@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ListView from "./ListView";
-import "./App.css";
 import DetailView from "./DetailView";
+import "./App.css";
 
 /**
  * Main react app component

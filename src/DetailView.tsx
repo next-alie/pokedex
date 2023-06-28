@@ -3,7 +3,7 @@ import ResetApp from "./ResetApp";
 import { UsedPokemonValues } from "./PokeCard";
 
 /**
- * Component thayt tdsts detailPokemon, has a search bar and a label picker
+ * Component thayt lists detailPokemon, has a search bar and a label picker
  */
 export default function ListView({
   setDetailPokemon,
@@ -37,7 +37,7 @@ export default function ListView({
                 return (
                   <div key={detailPokemon.name + "-" + type.type.name}>
                     <img
-                      className="intdne"
+                      className="inline"
                       src={
                         "icons/" +
                         type.type.name[0].toUpperCase() +
@@ -58,7 +58,8 @@ export default function ListView({
         <div>
           <table className="border">
             <tr>
-              <th>Stat</th> <th className="pr-3">Value</th>
+              <th>Stat</th>
+              <th className="pr-3">Value</th>
             </tr>
             {detailPokemon.stats.map((stat) => {
               return (
