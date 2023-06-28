@@ -1,24 +1,36 @@
 import { useEffect, useState } from "react";
-import { PokemonClient, PokemonType } from "pokenode-ts";
+import { PokemonClient, PokemonStat, PokemonType } from "pokenode-ts";
 
 const api = new PokemonClient();
 
-interface UsedPokemonValues {
+export interface UsedPokemonValues {
   name: string;
   sprite: string;
   types: PokemonType[];
+  stats: PokemonStat[];
+  height: number;
+  weight: number;
 }
 
 /**
  * Component that contains a pokemon sprite, name and types.
  * Fetches that info by itself
  */
-export default function PokeCard({ name }: { name: string }) {
+export default function PokeCard({
+  name,
+  onClick,
+}: {
+  name: string;
+  onClick: Function;
+}) {
   const [loading, setLoading] = useState(true);
   const [pokemon, setPokemon] = useState<UsedPokemonValues>({
     name: "",
     sprite: "",
     types: [],
+    stats: [],
+    height: 0,
+    weight: 0,
   });
 
   useEffect(() => {
@@ -43,6 +55,9 @@ export default function PokeCard({ name }: { name: string }) {
             name: newPokemon.name,
             sprite: newPokemon.sprites.front_default!,
             types: newPokemon.types,
+            stats: newPokemon.stats,
+            height: newPokemon.height / 10,
+            weight: newPokemon.weight / 10,
           };
           // Try to save it!
           try {
@@ -82,7 +97,9 @@ export default function PokeCard({ name }: { name: string }) {
     );
 
   return (
-    <div className="w-full bg-gray-600 text-white rounded-lg p-12 flex flex-col justify-center items-center">
+    <div
+      className="w-full bg-gray-600 text-white rounded-lg p-12 flex flex-col justify-center items-center"
+      onClick={() => onClick()}>
       <div className="">
         <img
           className="object-center object-cover h-36 w-36"
