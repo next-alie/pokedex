@@ -1,78 +1,66 @@
-import { SetStateAction, useEffect, useState } from "react";
-import "./App.css";
-import PokeCard from "./PokeCard";
-import { NamedAPIResource, Pokemon, PokemonClient } from "pokenode-ts";
+import { SetStateAction, useState } from "react";
+import { Pokemon } from "pokenode-ts";
 import LabelBar from "./LabelBar";
 import SearchBar from "./SearchBar";
+import PokeList from "./PokeList";
+import "./App.css";
+import Button from "./Button";
 
-const api = new PokemonClient();
-
+/**
+ * Main react app component
+ */
 export default function App() {
-  const [page, setPage] = useState(0);
-  const [pokemonList, setPokemonList] = useState<NamedAPIResource[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
 
-  // useEffect with an empty dependency array works the same way as componentDidMount
-  useEffect(() => {
-    async function fetchPokemons() {
-      // Fetch pokemon list from api
-      // TODO: Cache this
-      // TODO: Move pokemon list to its own component
-      try {
-        // set loading to true before calling API
-        setLoading(true);
-        const newPokemonList = (await api.listPokemons(0, 9999)).results;
-        setPokemonList(newPokemonList);
-        // switch loading to false after fetch is complete
-        setLoading(false);
-      } catch (error) {
-        // add error handling here
-        setLoading(false);
-        console.error(error);
-      }
-    }
-    fetchPokemons();
-  }, []);
-
-  // return a Spinner when loading is true
-  if (loading)
-    return (
-      <img
-        src="icons/simple_pokeball.gif"
-        alt="Loading"
-      />
-    );
-
-  function handleChange(e: { target: { value: SetStateAction<string> } }) {
+  /**
+   * Handles change in inputs and sets their value to such
+   */
+  function handleChange(e: {
+    target: { value: SetStateAction<string> };
+  }): void {
     setQuery(e.target.value);
   }
 
-  function nextPage() {
-    const newPage = page <= getDrawnPokemons().length - 20 ? page + 20 : page;
+  /**
+   * Sets page to page + 1
+   */
+  function nextPage(): void {
+    const newPage = page + 1;
     setPage(newPage);
   }
 
-  function prevPage() {
-    const newPage = page >= 20 ? page - 20 : page;
+  /**
+   * Sets page to page - 1
+   */
+  function prevPage(): void {
+    const newPage = page > 1 ? page - 1 : page;
     setPage(newPage);
   }
 
-  function handleClick(type: string) {
+  /**
+   * Sellects or unselects the label that has been clicked to a max of 2 types
+   * @param type The name of the pokemon type clicked
+   */
+  function handleClick(type: string): void {
     let newSelected = selected.slice();
     if (newSelected.includes(type)) {
       newSelected = newSelected.filter((i) => i !== type);
-      setPage(0);
+      setPage(1);
     } else if (newSelected.length < 2) {
       newSelected.push(type);
-      setPage(0);
+      setPage(1);
     }
     setSelected(newSelected);
   }
 
-  function getDrawnPokemons() {
-    let drawnList = pokemonList;
+  /**
+   * Filters by selected types via "and" and filters by name searched
+   * @param drawnList gets the full list of pokemons
+   * @returns a list of Pokemon
+   */
+  function getDrawnPokemons(drawnList: Pokemon[]): Pokemon[] {
     if (selected.length > 1) {
       const type1 = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
@@ -86,10 +74,17 @@ export default function App() {
         selected[0]
       ].pokemon.map((i: { pokemon: any }) => i.pokemon);
     }
-    return filterItems(drawnList, query);
+    drawnList = filterItems(drawnList, query);
+    return drawnList;
   }
 
-  function filterItems(items: any[], query: string) {
+  /**
+   * Filters by text querry the input and returns it
+   * @param items A list of Pokemon
+   * @param query A string that determines the filter
+   * @returns A filtered by text query Pokemon list
+   */
+  function filterItems(items: Pokemon[], query: string): Pokemon[] {
     query = query.toLowerCase();
     return items.filter((item: { name: string }) =>
       item.name
@@ -98,39 +93,47 @@ export default function App() {
     );
   }
 
+  /**
+   * Flushes the local storage and then reloads the app
+   */
+  function resetApp(): void {
+    localStorage.clear();
+    location.reload();
+  }
+
   return (
     <>
-      <SearchBar
-        query={query}
-        handleChange={handleChange}
-      />
+      <div className="mb-5 flex justify-around items-center">
+        <SearchBar
+          query={query}
+          handleChange={handleChange}
+        />
+        <Button
+          label={"Clear Storage"}
+          onClick={resetApp}
+        />
+      </div>
       <LabelBar
         selected={selected}
         handleClick={handleClick}
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-6 justify-center">
-        {getDrawnPokemons()
-          .slice(page, page + 20)
-          .map((pokemon: Pokemon) => {
-            return (
-              <PokeCard
-                key={pokemon.name}
-                name={pokemon.name}
-              />
-            );
-          })}
+      <PokeList
+        page={page}
+        getDrawnPokemons={getDrawnPokemons}
+      />
+      <div className="flex justify-center">
+        <Button
+          label={"<-"}
+          onClick={prevPage}
+        />
+        <div className="flex flex-col justify-center">
+          <p>{page}</p>
+        </div>
+        <Button
+          label={"->"}
+          onClick={nextPage}
+        />
       </div>
-      <button
-        type="button"
-        onClick={prevPage}>
-        {"<-"}
-      </button>
-      {page / 20 + 1}
-      <button
-        type="button"
-        onClick={nextPage}>
-        {"->"}
-      </button>
     </>
   );
 }

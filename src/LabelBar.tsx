@@ -11,18 +11,38 @@ export default function LabelBar({
   selected: string[];
   handleClick: Function;
 }) {
-  const [types, setTypes] = useState<NamedAPIResource[]>();
+  const [types, setTypeList] = useState<NamedAPIResource[]>();
   // useEffect with an empty dependency array works the same way as componentDidMount
   useEffect(() => {
+    /**
+     *  Fetch type list from api or localStorage
+     */
     async function fetchTypes() {
-      // Fetch type list from api
-      // TODO: Cache this
-      try {
-        const newTypesList: NamedAPIResource[] = (await api.listTypes(0, 9999))
-          .results;
-        setTypes(newTypesList);
-      } catch (error) {
-        console.error(error);
+      // Check if the pokemon is in local storage
+      const newJson = localStorage.getItem("type-list");
+      console.log("🚀 ~ file: LabelBar.tsx:23 ~ fetchTypes ~ newJson:", newJson)
+      if (newJson) {
+        setTypeList(JSON.parse(newJson));
+      } else {
+        // Fetch pokemon list from api
+        try {
+          const newTypesList: NamedAPIResource[] = (
+            await api.listTypes(0, 9999)
+          ).results;
+          // Try to save it!
+          try {
+            localStorage.setItem(
+              "type-list",
+              JSON.stringify(newTypesList)
+            );
+          } catch (error) {
+            // add error handling here
+            console.error(error);
+          }
+          setTypeList(newTypesList);
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
     fetchTypes();

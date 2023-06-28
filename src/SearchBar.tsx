@@ -10,7 +10,7 @@ export default function SearchBar({
   handleChange: ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
-    <div className="mb-5">
+    <div className="">
       <label>
         Search:{" "}
         <input
