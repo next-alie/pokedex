@@ -52,9 +52,10 @@ export default function ListView({
                 );
               })}
             </div>
-            <p className="text-lg pb-2">
-              {detailPokemon.height + "m " + detailPokemon.weight + "kg"}
+            <p className="text-lg pt-2">
+              {"Height: " + detailPokemon.height + "m"}
             </p>
+            <p className="text-lg pb-2">{"Weight: " + detailPokemon.weight + "kg"}</p>
           </div>
         </div>
         <div>
