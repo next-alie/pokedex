@@ -1,22 +1,79 @@
-import { SetStateAction, useState } from "react";
-import { Pokemon } from "pokenode-ts";
+import { SetStateAction, useEffect, useState } from "react";
+import { NamedAPIResource, PokemonClient } from "pokenode-ts";
 import LabelBar from "./LabelBar";
 import SearchBar from "./SearchBar";
 import PokeList from "./PokeList";
 import Button from "./Button";
 import ResetApp from "./ResetApp";
 
+const api = new PokemonClient();
+
 /**
  * Component thayt lists pokemon, has a search bar and a label picker
  */
 export default function ListView({
   setDetailPokemon,
+  setReload,
 }: {
   setDetailPokemon: Function;
+  setReload: Function;
 }) {
+  const [maxPage, setMaxPage] = useState(Infinity);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [pokemonList, setPokemonList] = useState<NamedAPIResource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [drawnPokemon, setDrawnPokemon] = useState<NamedAPIResource[]>([]);
+
+  // useEffect with an empty dependency array works the same way as componentDidMount
+  useEffect(() => {
+    /**
+     *  Fetch pokemon list from api or localStorage
+     */
+    async function fetchPokemons() {
+      // set loading to true before calling API
+      setLoading(true);
+      // Check if the pokemon is in local storage
+      const newJson = localStorage.getItem("pokemon-list");
+      if (newJson) {
+        const newPokemonList = JSON.parse(newJson)
+        setPokemonList(newPokemonList);
+        setLoading(false);
+      } else {
+        // Fetch pokemon list from api
+        try {
+          const newPokemonList = (await api.listPokemons(0, 9999)).results;
+          // Try to save it!
+          try {
+            localStorage.setItem(
+              "pokemon-list",
+              JSON.stringify(newPokemonList)
+            );
+          } catch (error) {
+            // add error handling here
+            setLoading(false);
+            console.error(error);
+          }
+          setPokemonList(newPokemonList);
+          // switch loading to false after fetch is complete
+          setLoading(false);
+        } catch (error) {
+          // add error handling here
+          setLoading(false);
+          console.error(error);
+        }
+        // We are ready to show the card
+        // switch loading to false after fetch is complete
+        setLoading(false);
+      }
+    }
+    fetchPokemons();
+  }, []);
+
+  useEffect(() => {
+    setDrawnPokemon(getDrawnPokemons(pokemonList));
+  }, [selected, query, pokemonList]);
 
   /**
    * Handles change in inputs and sets their value to such
@@ -31,7 +88,7 @@ export default function ListView({
    * Sets page to page + 1
    */
   function nextPage(): void {
-    const newPage = page + 1;
+    const newPage = page < maxPage ? page + 1 : page;
     setPage(newPage);
   }
 
@@ -64,7 +121,7 @@ export default function ListView({
    * @param drawnList gets the full list of pokemons
    * @returns a list of Pokemon
    */
-  function getDrawnPokemons(drawnList: Pokemon[]): Pokemon[] {
+  function getDrawnPokemons(drawnList: NamedAPIResource[]): NamedAPIResource[] {
     if (selected.length > 1) {
       const type1 = JSON.parse(localStorage.getItem("types")!)[
         selected[0]
@@ -79,6 +136,7 @@ export default function ListView({
       ].pokemon.map((i: { pokemon: any }) => i.pokemon);
     }
     drawnList = filterItems(drawnList, query);
+    setMaxPage(drawnList.length / 20);
     return drawnList;
   }
 
@@ -88,7 +146,10 @@ export default function ListView({
    * @param query A string that determines the filter
    * @returns A filtered by text query Pokemon list
    */
-  function filterItems(items: Pokemon[], query: string): Pokemon[] {
+  function filterItems(
+    items: NamedAPIResource[],
+    query: string
+  ): NamedAPIResource[] {
     query = query.toLowerCase();
     return items.filter((item: { name: string }) =>
       item.name
@@ -97,6 +158,16 @@ export default function ListView({
     );
   }
 
+  // return a Spinner when loading is true
+  if (loading)
+    return (
+      <img
+        className="inline"
+        src="icons/simple_pokeball.gif"
+        alt="Loading"
+      />
+    );
+
   return (
     <>
       <div className="mb-5 flex justify-around items-center">
@@ -104,7 +175,7 @@ export default function ListView({
           query={query}
           handleChange={handleChange}
         />
-        <ResetApp />
+        <ResetApp setReload={setReload} />
       </div>
       <LabelBar
         selected={selected}
@@ -112,7 +183,7 @@ export default function ListView({
       />
       <PokeList
         page={page}
-        getDrawnPokemons={getDrawnPokemons}
+        drawnPokemons={drawnPokemon}
         setDetailPokemon={setDetailPokemon}
       />
       <div className="flex justify-center">

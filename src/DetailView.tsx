@@ -6,9 +6,11 @@ import { UsedPokemonValues } from "./PokeCard";
  * Component thayt lists detailPokemon, has a search bar and a label picker
  */
 export default function ListView({
+  setReload,
   setDetailPokemon,
   detailPokemon,
 }: {
+  setReload: Function;
   setDetailPokemon: Function;
   detailPokemon: UsedPokemonValues;
 }) {
@@ -19,7 +21,7 @@ export default function ListView({
           label={"Back"}
           onClick={() => setDetailPokemon("")}
         />
-        <ResetApp />
+        <ResetApp setReload={setReload} />
       </div>
       <div className="w-full bg-gray-600 text-white rounded-lg p-12 flex flex-col justify-center items-center md:flex-row md:justify-around">
         <div>
