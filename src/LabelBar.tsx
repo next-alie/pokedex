@@ -24,10 +24,6 @@ export default function LabelBar({
     async function fetchTypes() {
       // Check if the pokemon is in local storage
       const newJson = localStorage.getItem("type-list");
-      console.log(
-        "🚀 ~ file: LabelBar.tsx:23 ~ fetchTypes ~ newJson:",
-        newJson
-      );
       if (newJson) {
         setTypeList(JSON.parse(newJson));
       } else {

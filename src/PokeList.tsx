@@ -9,9 +9,11 @@ const api = new PokemonClient();
  * Loads pokemon listage data
  */
 export default function PokeList({
+  setDetailPokemon,
   getDrawnPokemons,
   page,
 }: {
+  setDetailPokemon: Function;
   getDrawnPokemons: Function;
   page: number;
 }) {
@@ -81,6 +83,7 @@ export default function PokeList({
             <PokeCard
               key={pokemon.name}
               name={pokemon.name}
+              onClick={() => setDetailPokemon(pokemon.name)}
             />
           );
         })}
