@@ -91,7 +91,7 @@ export default function PokeCard({
   if (loading)
     return (
       <img
-        src="icons/simple_pokeball.gif"
+        src="simple_pokeball.gif"
         alt="Loading"
       />
     );
