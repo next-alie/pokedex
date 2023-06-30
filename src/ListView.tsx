@@ -37,7 +37,7 @@ export default function ListView({
       // Check if the pokemon is in local storage
       const newJson = localStorage.getItem("pokemon-list");
       if (newJson) {
-        const newPokemonList = JSON.parse(newJson)
+        const newPokemonList = JSON.parse(newJson);
         setPokemonList(newPokemonList);
         setLoading(false);
       } else {
@@ -157,6 +157,9 @@ export default function ListView({
         .some((word: string) => word.toLowerCase().startsWith(query))
     );
   }
+  function getRandomPokemonName(pokemonList: NamedAPIResource[]) {
+    return pokemonList[Math.floor(Math.random() * pokemonList.length)].name;
+  }
 
   // return a Spinner when loading is true
   if (loading)
@@ -175,7 +178,13 @@ export default function ListView({
           query={query}
           handleChange={handleChange}
         />
-        <ResetApp setReload={setReload} />
+        <div className="flex justify-around items-center">
+          <Button
+            label={"Random"}
+            onClick={() => setDetailPokemon(getRandomPokemonName(drawnPokemon))}
+          />
+          <ResetApp setReload={setReload} />
+        </div>
       </div>
       <LabelBar
         selected={selected}

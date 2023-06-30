@@ -24,9 +24,7 @@ export default function App() {
       <DetailView
         setReload={setReload}
         setDetailPokemon={setDetailPokemon}
-        detailPokemon={
-          JSON.parse(localStorage.getItem("pokemon")!)[detailPokemon]
-        }
+        name={detailPokemon}
       />
     );
   }
