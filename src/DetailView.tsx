@@ -82,6 +82,11 @@ export default function DetailView({
     loadPokemon();
   }, []);
 
+  function getRandomPokemonNameCache() {
+    const pokemonList = JSON.parse(localStorage.getItem("pokemon-list")!)
+    return pokemonList[Math.floor(Math.random() * pokemonList.length)].name;
+  }
+
   // return a Spinner when loading is true
   if (loading)
     return (
@@ -91,7 +96,6 @@ export default function DetailView({
       />
     );
 
-
   return (
     <div className="w-full">
       <div className="mb-5 flex justify-around items-center">
@@ -99,7 +103,13 @@ export default function DetailView({
           label={"Back"}
           onClick={() => setDetailPokemon("")}
         />
-        <ResetApp setReload={setReload} />
+        <div className="flex justify-around items-center">
+          <Button
+            label={"Random"}
+            onClick={() => setDetailPokemon(getRandomPokemonNameCache())}
+          />
+          <ResetApp setReload={setReload} />
+        </div>{" "}
       </div>
       <div className="w-full bg-gray-600 text-white rounded-lg p-12 flex flex-col justify-center items-center md:flex-row md:justify-around">
         <div>
@@ -133,7 +143,9 @@ export default function DetailView({
             <p className="text-lg pt-2">
               {"Height: " + detailPokemon.height + "m"}
             </p>
-            <p className="text-lg pb-2">{"Weight: " + detailPokemon.weight + "kg"}</p>
+            <p className="text-lg pb-2">
+              {"Weight: " + detailPokemon.weight + "kg"}
+            </p>
           </div>
         </div>
         <div>
