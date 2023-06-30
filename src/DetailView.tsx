@@ -1,27 +1,115 @@
 import Button from "./Button";
 import ResetApp from "./ResetApp";
 import { UsedPokemonValues } from "./PokeCard";
+import { useEffect, useState } from "react";
+import { PokemonClient } from "pokenode-ts";
+
+const api = new PokemonClient();
 
 /**
- * Component thayt lists detailPokemon, has a search bar and a label picker
+ * Component that lists detailPokemon, has a search bar and a label picker
  */
-export default function ListView({
+export default function DetailView({
   setReload,
   setDetailPokemon,
-  detailPokemon,
+  name,
 }: {
   setReload: Function;
   setDetailPokemon: Function;
-  detailPokemon: UsedPokemonValues;
+  name: string;
 }) {
+  const [loading, setLoading] = useState(true);
+  const [detailPokemon, setPokemon] = useState<UsedPokemonValues>({
+    name: "",
+    sprite: "",
+    types: [],
+    stats: [],
+    height: 0,
+    weight: 0,
+  });
+
+  useEffect(() => {
+    /**
+     * Fetches all the specific pokemon data used by the app
+     */
+    async function loadPokemon() {
+      // Check if the pokemon is in local storage
+      const newJson = localStorage.getItem("pokemon");
+      const newPokemon = newJson ? JSON.parse(newJson)[name] : null;
+      if (newPokemon) {
+        setPokemon(newPokemon);
+        setLoading(false);
+      } else {
+        try {
+          // set loading to true before calling API
+          setLoading(true);
+          // Call api to fetch type info
+          const newPokemon = await api.getPokemonByName(name);
+          // Only save used data
+          const usedPokemonValues: UsedPokemonValues = {
+            name: newPokemon.name,
+            sprite: newPokemon.sprites.front_default!,
+            types: newPokemon.types,
+            stats: newPokemon.stats,
+            height: newPokemon.height / 10,
+            weight: newPokemon.weight / 10,
+          };
+          // Try to save it!
+          try {
+            let pokemonJson = localStorage.getItem("pokemon");
+            let pokemons: { [index: string]: any } = {};
+            if (pokemonJson) {
+              pokemons = JSON.parse(pokemonJson);
+              pokemons[name] = usedPokemonValues;
+            } else {
+              pokemons[name] = usedPokemonValues;
+            }
+            localStorage.setItem("pokemon", JSON.stringify(pokemons));
+          } catch (error) {
+            console.error(error);
+          }
+          // We are ready to show the card
+          setPokemon(usedPokemonValues);
+          // switch loading to false after fetch is complete
+          setLoading(false);
+        } catch (error) {
+          // add error handling here
+          setLoading(false);
+          console.error(error);
+        }
+      }
+    }
+    loadPokemon();
+  }, []);
+
+  function getRandomPokemonNameCache() {
+    const pokemonList = JSON.parse(localStorage.getItem("pokemon-list")!)
+    return pokemonList[Math.floor(Math.random() * pokemonList.length)].name;
+  }
+
+  // return a Spinner when loading is true
+  if (loading)
+    return (
+      <img
+        src="simple_pokeball.gif"
+        alt="Loading"
+      />
+    );
+
   return (
     <div className="w-full">
-      <div className="mb-5 flex justify-between items-center">
+      <div className="mb-5 flex justify-around items-center">
         <Button
           label={"Back"}
           onClick={() => setDetailPokemon("")}
         />
-        <ResetApp setReload={setReload} />
+        <div className="flex justify-around items-center">
+          <Button
+            label={"Random"}
+            onClick={() => setDetailPokemon(getRandomPokemonNameCache())}
+          />
+          <ResetApp setReload={setReload} />
+        </div>{" "}
       </div>
       <div className="w-full bg-gray-600 text-white rounded-lg p-12 flex flex-col justify-center items-center md:flex-row md:justify-around">
         <div>
@@ -55,7 +143,9 @@ export default function ListView({
             <p className="text-lg pt-2">
               {"Height: " + detailPokemon.height + "m"}
             </p>
-            <p className="text-lg pb-2">{"Weight: " + detailPokemon.weight + "kg"}</p>
+            <p className="text-lg pb-2">
+              {"Weight: " + detailPokemon.weight + "kg"}
+            </p>
           </div>
         </div>
         <div>
