@@ -163,7 +163,7 @@ export default function ListView({
     return (
       <img
         className="inline"
-        src="icons/simple_pokeball.gif"
+        src="simple_pokeball.gif"
         alt="Loading"
       />
     );
