@@ -192,7 +192,7 @@ export default function ListView({
           onClick={prevPage}
         />
         <div className="flex flex-col justify-center">
-          <p>{page}</p>
+          <p>{page + "/" + Math.ceil(maxPage)}</p>
         </div>
         <Button
           label={"->"}
