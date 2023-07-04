@@ -9,13 +9,24 @@ import "./App.css";
 export default function App() {
   const [detailPokemon, setDetailPokemon] = useState("");
   const [reload, setReload] = useState(false);
+  const [force, setForce] = useState(false);
+
   // If reload is true reload and set state to initial value
   useEffect(() => {
     setDetailPokemon("")
     setReload(false);
   }, [reload]);
 
-  if (reload) {
+  // Force state change to reload
+  useEffect(() => {
+    setForce(false);
+  }, [force]);
+
+  useEffect(() => {
+    setForce(true)
+  }, [detailPokemon]);
+  
+  if (reload || force) {
     return "";
   }
 
@@ -24,9 +35,7 @@ export default function App() {
       <DetailView
         setReload={setReload}
         setDetailPokemon={setDetailPokemon}
-        detailPokemon={
-          JSON.parse(localStorage.getItem("pokemon")!)[detailPokemon]
-        }
+        name={detailPokemon}
       />
     );
   }
