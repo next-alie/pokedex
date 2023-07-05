@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.1.0",
   "type": "module",
-  "homepage": "https://alieneon.github.io/pokedex",
+  "homepage": "http://alieneon.github.io/pokedex",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
